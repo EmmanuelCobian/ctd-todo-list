@@ -2,19 +2,18 @@ import TodoListItem from './TodoListItem';
 
 function TodoList({ todoList, onCompleteTodo, onUpdateTodo }) {
   const filteredTodoList = todoList.filter((todo) => !todo.isCompleted);
+  const hasTodos = filteredTodoList.length > 0;
+
+  if (!hasTodos) {
+    return <p>Add a todo above to get started</p>;
+  }
 
   return (
-    <>
-      {filteredTodoList.length === 0 ? (
-        <p>Add a todo above to get started</p>
-      ) : (
-        <ul>
-          {filteredTodoList.map((todo) => (
-            <TodoListItem key={todo.id} todo={todo} onCompleteTodo={onCompleteTodo} onUpdateTodo={onUpdateTodo} />
-          ))}
-        </ul>
-      )}
-    </>
+    <ul>
+      {filteredTodoList.map((todo) => (
+        <TodoListItem key={todo.id} todo={todo} onCompleteTodo={onCompleteTodo} onUpdateTodo={onUpdateTodo} />
+      ))}
+    </ul>
   );
 }
 
