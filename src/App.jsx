@@ -12,14 +12,57 @@ function App() {
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
   const token = `Bearer ${import.meta.env.VITE_PAT}`;
 
-  const completeTodo = (id) => {
+  const completeTodo = async (id) => {
+    const originalTodo = todoList.find((todo) => todo.id === id);
+
     const updatedTodos = todoList.map((todo) => {
       if (todo.id == id) {
         return { ...todo, isCompleted: true };
       }
       return todo;
     });
+
     setTodoList(updatedTodos);
+
+    const payload = {
+      records: [
+        {
+          id: originalTodo.id,
+          fields: {
+            title: originalTodo.title,
+            isCompleted: true,
+          },
+        },
+      ],
+    };
+    const options = {
+      method: 'PATCH',
+      headers: {
+        Authorization: token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    };
+
+    try {
+      setIsSaving(true);
+      const resp = await fetch(url, options);
+      if (!resp.ok) {
+        throw new Error(resp.message);
+      }
+    } catch (error) {
+      console.error(error.message);
+      setErrorMessage(`${error.message}. Reverting todo completion...`);
+      const revertedTodos = updatedTodos.map((todo) => {
+        if (todo.id === originalTodo.id) {
+          return originalTodo;
+        }
+        return todo;
+      });
+      setTodoList(revertedTodos);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const addTodo = async (title) => {
