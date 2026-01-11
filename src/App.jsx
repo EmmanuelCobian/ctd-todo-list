@@ -2,6 +2,7 @@ import './App.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
 import { useState, useEffect } from 'react';
+import { getAirtableUrl, getAuthToken, createOptions } from './lib/api';
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -9,19 +10,12 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
-  const token = `Bearer ${import.meta.env.VITE_PAT}`;
+  const url = getAirtableUrl();
+  const token = getAuthToken();
 
   const completeTodo = async (id) => {
     const originalTodo = todoList.find((todo) => todo.id === id);
-
-    const updatedTodos = todoList.map((todo) => {
-      if (todo.id == id) {
-        return { ...todo, isCompleted: true };
-      }
-      return todo;
-    });
-
+    const updatedTodos = todoList.map((todo) => (todo.id === id ? { ...todo, isCompleted: true } : todo));
     setTodoList(updatedTodos);
 
     const payload = {
@@ -35,14 +29,8 @@ function App() {
         },
       ],
     };
-    const options = {
-      method: 'PATCH',
-      headers: {
-        Authorization: token,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    };
+
+    const options = createOptions('PATCH', token, payload);
 
     try {
       setIsSaving(true);
@@ -52,13 +40,8 @@ function App() {
       }
     } catch (error) {
       console.error(error.message);
-      setErrorMessage(`${error.message}. Reverting todo completion...`);
-      const revertedTodos = updatedTodos.map((todo) => {
-        if (todo.id === originalTodo.id) {
-          return originalTodo;
-        }
-        return todo;
-      });
+      setErrorMessage(`Could not complete todo — ${error.message}. Reverting...`);
+      const revertedTodos = updatedTodos.map((todo) => (todo.id === originalTodo.id ? originalTodo : todo));
       setTodoList(revertedTodos);
     } finally {
       setIsSaving(false);
@@ -77,14 +60,7 @@ function App() {
       ],
     };
 
-    const options = {
-      method: 'POST',
-      headers: {
-        Authorization: token,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    };
+    const options = createOptions('POST', token, payload);
 
     try {
       setIsSaving(true);
@@ -94,14 +70,18 @@ function App() {
       }
 
       const { records } = await resp.json();
-      const savedTodo = { title: records[0].fields.title, isCompleted: true, id: records[0].id };
-
+      const savedTodo = {
+        title: records[0].fields.title,
+        isCompleted: true,
+        id: records[0].id,
+      };
       if (!records[0].fields.isCompleted) {
         savedTodo.isCompleted = false;
       }
+
       setTodoList([...todoList, savedTodo]);
     } catch (error) {
-      setErrorMessage(error.message);
+      setErrorMessage(`Could not add todo — ${error.message}`);
       console.error(error.message);
     } finally {
       setIsSaving(false);
@@ -131,14 +111,8 @@ function App() {
         },
       ],
     };
-    const options = {
-      method: 'PATCH',
-      headers: {
-        Authorization: token,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    };
+
+    const options = createOptions('PATCH', token, payload);
 
     try {
       setIsSaving(true);
@@ -148,13 +122,8 @@ function App() {
       }
     } catch (error) {
       console.error(error.message);
-      setErrorMessage(`${error.message}. Reverting todo...`);
-      const revertedTodos = updatedTodos.map((todo) => {
-        if (todo.id === originalTodo.id) {
-          return originalTodo;
-        }
-        return todo;
-      });
+      setErrorMessage(`Could not update todo — ${error.message}. Reverting...`);
+      const revertedTodos = updatedTodos.map((todo) => (todo.id === originalTodo.id ? originalTodo : todo));
       setTodoList(revertedTodos);
     } finally {
       setIsSaving(false);
@@ -164,19 +133,10 @@ function App() {
   useEffect(() => {
     const fetchTodos = async () => {
       setIsLoading(true);
-      const options = {
-        method: 'GET',
-        headers: {
-          Authorization: token,
-        },
-      };
+      const options = createOptions('GET', token);
 
       try {
         const resp = await fetch(url, options);
-        if (!resp.ok) {
-          throw new Error(resp.message);
-        }
-
         const response = await resp.json();
         const todos = response.records.map((record) => {
           const todo = {
@@ -193,7 +153,7 @@ function App() {
         });
         setTodoList(todos);
       } catch (error) {
-        setErrorMessage(error.message);
+        setErrorMessage(`Could not load todos — ${error.message}`);
       } finally {
         setIsLoading(false);
       }
