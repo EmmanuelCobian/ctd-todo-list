@@ -5,9 +5,13 @@ import TodosViewForm from './features/TodosViewForm';
 import { useState, useEffect } from 'react';
 import { getAirtableUrl, getAuthToken, createOptions } from './lib/api';
 
-const encodeUrl = ({ sortField, sortDirection }) => {
+const encodeUrl = ({ sortField, sortDirection, queryString }) => {
+  let searchQuery = '';
   let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-  return encodeURI(`${getAirtableUrl()}?${sortQuery}`);
+  if (queryString) {
+    searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+  }
+  return encodeURI(`${getAirtableUrl()}?${sortQuery}${searchQuery}`);
 };
 
 function App() {
@@ -17,8 +21,9 @@ function App() {
   const [isSaving, setIsSaving] = useState(false);
   const [sortField, setSortField] = useState('createdTime');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [queryString, setQueryString] = useState('');
 
-  const url = encodeUrl({ sortField, sortDirection });
+  const url = encodeUrl({ sortField, sortDirection, queryString });
   const token = getAuthToken();
 
   const completeTodo = async (id) => {
@@ -168,7 +173,7 @@ function App() {
     };
 
     fetchTodos();
-  }, [sortField, sortDirection]);
+  }, [sortField, sortDirection, queryString]);
 
   if (errorMessage) {
     return (
@@ -191,6 +196,8 @@ function App() {
         sortField={sortField}
         setSortDirection={setSortDirection}
         setSortField={setSortField}
+        queryString={queryString}
+        setQueryString={setQueryString}
       />
     </div>
   );
