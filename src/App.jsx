@@ -4,13 +4,20 @@ import TodoForm from './features/TodoForm';
 import { useState, useEffect } from 'react';
 import { getAirtableUrl, getAuthToken, createOptions } from './lib/api';
 
+const encodeUrl = ({ sortField, sortDirection }) => {
+  let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+  return encodeURI(`${getAirtableUrl()}?${sortQuery}`);
+};
+
 function App() {
   const [todoList, setTodoList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [sortField, setSortField] = useState('createdTime');
+  const [sortDirection, setSortDirection] = useState('desc');
 
-  const url = getAirtableUrl();
+  const url = encodeUrl({ sortField, sortDirection });
   const token = getAuthToken();
 
   const completeTodo = async (id) => {
@@ -160,7 +167,7 @@ function App() {
     };
 
     fetchTodos();
-  }, []);
+  }, [sortField, sortDirection]);
 
   if (errorMessage) {
     return (
