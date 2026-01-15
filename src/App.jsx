@@ -1,6 +1,7 @@
 import './App.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
+import TodosViewForm from './features/TodosViewForm';
 import { useState, useEffect } from 'react';
 import { getAirtableUrl, getAuthToken, createOptions } from './lib/api';
 
@@ -184,6 +185,13 @@ function App() {
       <h1>My Todos</h1>
       <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
       <TodoList todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} isLoading={isLoading} />
+      <hr />
+      <TodosViewForm
+        sortDirection={sortDirection}
+        sortField={sortField}
+        setSortDirection={setSortDirection}
+        setSortField={setSortField}
+      />
     </div>
   );
 }
