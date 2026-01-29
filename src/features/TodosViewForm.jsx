@@ -1,4 +1,14 @@
 import { useState, useEffect } from 'react';
+import styles from './TodosViewForm.module.css';
+import styled from 'styled-components';
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  flex-wrap: no-wrap;
+  align-items: center;
+  margin-top: 1rem;
+`;
 
 function TodosViewForm({ sortDirection, setSortDirection, sortField, setSortField, queryString, setQueryString }) {
   const [localQueryString, setLocalQueryString] = useState(queryString);
@@ -11,10 +21,11 @@ function TodosViewForm({ sortDirection, setSortDirection, sortField, setSortFiel
   }, [localQueryString, setQueryString]);
 
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <div>
+    <StyledForm onSubmit={(e) => e.preventDefault()}>
+      <div className={styles.flexDiv}>
         <label htmlFor="search">Search todos:</label>
         <input
+          className={styles.input}
           type="text"
           value={localQueryString}
           onChange={(e) => {
@@ -30,9 +41,12 @@ function TodosViewForm({ sortDirection, setSortDirection, sortField, setSortFiel
           Clear
         </button>
       </div>
-      <div>
-        <label htmlFor="sortBy">Sort by</label>
+      <div className={styles.flexDiv}>
+        <label className={styles.label} htmlFor="sortBy">
+          Sort by
+        </label>
         <select
+          className={styles.select}
           name="sortBy"
           id="sortBy"
           onChange={(e) => {
@@ -44,8 +58,11 @@ function TodosViewForm({ sortDirection, setSortDirection, sortField, setSortFiel
           <option value="createdTime">Time added</option>
         </select>
 
-        <label htmlFor="direction">Direction</label>
+        <label className={styles.label} htmlFor="direction">
+          Direction
+        </label>
         <select
+          className={styles.select}
           name="direction"
           id="direction"
           onChange={(e) => setSortDirection(e.target.value)}
@@ -55,7 +72,7 @@ function TodosViewForm({ sortDirection, setSortDirection, sortField, setSortFiel
           <option value="desc">Descending</option>
         </select>
       </div>
-    </form>
+    </StyledForm>
   );
 }
 
