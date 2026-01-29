@@ -1,5 +1,5 @@
 import './App.css';
-import styles from './App.module.css'
+import styles from './App.module.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
 import TodosViewForm from './features/TodosViewForm';
@@ -189,16 +189,18 @@ function App() {
   return (
     <div className={styles.container}>
       <h1>My Todos</h1>
-      <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
-      <TodoList todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} isLoading={isLoading} />
-      <TodosViewForm
-        sortDirection={sortDirection}
-        sortField={sortField}
-        setSortDirection={setSortDirection}
-        setSortField={setSortField}
-        queryString={queryString}
-        setQueryString={setQueryString}
-      />
+      <div>
+        <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
+        <TodoList todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} isLoading={isLoading} />
+        <TodosViewForm
+          sortDirection={sortDirection}
+          sortField={sortField}
+          setSortDirection={setSortDirection}
+          setSortField={setSortField}
+          queryString={queryString}
+          setQueryString={setQueryString}
+        />
+      </div>
     </div>
   );
 }
