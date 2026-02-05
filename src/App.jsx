@@ -31,8 +31,7 @@ function App() {
 
   const completeTodo = async (id) => {
     const originalTodo = todoState.todoList.find((todo) => todo.id === id);
-    dispatch({ type: todoActions.completeTodo, id: id });
-
+    dispatch({ type: todoActions.completeTodoRequest });
     const payload = {
       records: [
         {
@@ -47,17 +46,14 @@ function App() {
     const options = createOptions('PATCH', token, payload);
 
     try {
-      dispatch({ type: todoActions.startRequest });
       const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
+      dispatch({ type: todoActions.completeTodoSuccess, id: id });
     } catch (error) {
       console.error(error.message);
-      dispatch({ type: todoActions.setLoadError, error: error });
-      dispatch({ type: todoActions.revertTodo, editedTodo: originalTodo, error: error });
-    } finally {
-      dispatch({ type: todoActions.endRequest });
+      dispatch({ type: todoActions.completeTodoFailure, originalTodo: originalTodo, error: error });
     }
   };
 
@@ -76,25 +72,22 @@ function App() {
     const options = createOptions('POST', token, payload);
 
     try {
-      dispatch({ type: todoActions.startRequest });
+      dispatch({ type: todoActions.addTodoRequest });
       const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
 
       const { records } = await resp.json();
-      dispatch({ type: todoActions.addTodo, records: records });
+      dispatch({ type: todoActions.addTodoSuccess, records: records });
     } catch (error) {
-      dispatch({ type: todoActions.setLoadError, error: error });
-    } finally {
-      dispatch({ type: todoActions.endRequest });
+      dispatch({ type: todoActions.addTodoFailure, error: error });
     }
   };
 
   const updateTodo = async (editedTodo) => {
     const originalTodo = todoState.todoList.find((todo) => todo.id === editedTodo.id);
-    dispatch({ type: todoActions.updateTodo, editedTodo: editedTodo });
-
+    dispatch({ type: todoActions.updateTodoRequest });
     const payload = {
       records: [
         {
@@ -110,15 +103,13 @@ function App() {
     const options = createOptions('PATCH', token, payload);
 
     try {
-      dispatch({ type: todoActions.startRequest });
       const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
+      dispatch({ type: todoActions.updateTodoSuccess, editedTodo: editedTodo });
     } catch (error) {
-      dispatch({ type: todoActions.revertTodo, editedTodo: originalTodo, error: error });
-    } finally {
-      dispatch({ type: todoActions.endRequest });
+      dispatch({ type: todoActions.updateTodoFailure, originalTodo: originalTodo, error: error });
     }
   };
 
@@ -130,9 +121,9 @@ function App() {
       try {
         const resp = await fetch(url, options);
         const response = await resp.json();
-        dispatch({ type: todoActions.loadTodos, records: response.records });
+        dispatch({ type: todoActions.fetchTodosSuccess, records: response.records });
       } catch (error) {
-        dispatch({ type: todoActions.setLoadError, error: error });
+        dispatch({ type: todoActions.fetchTodosFailure, error: error });
       }
     };
 

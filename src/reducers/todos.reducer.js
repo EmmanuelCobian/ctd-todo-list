@@ -1,19 +1,20 @@
 const actions = {
-  //actions in useEffect that loads todos
   fetchTodos: 'fetchTodos',
-  loadTodos: 'loadTodos',
-  //found in useEffect and addTodo to handle failed requests
-  setLoadError: 'setLoadError',
-  //actions found in addTodo
-  startRequest: 'startRequest',
-  addTodo: 'addTodo',
-  endRequest: 'endRequest',
-  //found in helper functions
-  updateTodo: 'updateTodo',
-  completeTodo: 'completeTodo',
-  //reverts todos when requests fail
-  revertTodo: 'revertTodo',
-  //action on Dismiss Error button
+  fetchTodosSuccess: 'fetchTodosSuccess',
+  fetchTodosFailure: 'fetchTodosFailure',
+
+  addTodoRequest: 'addTodoRequest',
+  addTodoSuccess: 'addTodoSuccess',
+  addTodoFailure: 'addTodoFailure',
+
+  updateTodoRequest: 'updateTodoRequest',
+  updateTodoSuccess: 'updateTodoSuccess',
+  updateTodoFailure: 'updateTodoFailure',
+
+  completeTodoRequest: 'completeTodoRequest',
+  completeTodoSuccess: 'completeTodoSuccess',
+  completeTodoFailure: 'completeTodoFailure',
+
   clearError: 'clearError',
 };
 
@@ -33,20 +34,12 @@ const reducer = (state = initialState, action) => {
       };
     }
 
-    case actions.loadTodos: {
-      const todos = action.records.map((record) => {
-        const todo = {
-          title: record.fields.title,
-          id: record.id,
-          isCompleted: false,
-        };
-
-        if (Object.hasOwn(record.fields, 'isCompleted') && record.fields.isCompleted) {
-          todo.isCompleted = true;
-        }
-
-        return todo;
-      });
+    case actions.fetchTodosSuccess: {
+      const todos = action.records.map((record) => ({
+        title: record.fields.title,
+        id: record.id,
+        isCompleted: record.fields.isCompleted ?? false,
+      }));
       return {
         ...state,
         todoList: todos,
@@ -54,70 +47,97 @@ const reducer = (state = initialState, action) => {
       };
     }
 
-    case actions.setLoadError: {
+    case actions.fetchTodosFailure: {
       return {
         ...state,
-        error: action.error.message,
         isLoading: false,
+        error: action.error.message,
       };
     }
 
-    case actions.startRequest: {
+    case actions.addTodoRequest: {
       return {
         ...state,
         isSaving: true,
       };
     }
 
-    case actions.addTodo: {
-      const savedTodo = {
+    case actions.addTodoSuccess: {
+      const newTodo = {
         title: action.records[0].fields.title,
-        isCompleted: true,
         id: action.records[0].id,
+        isCompleted: action.records[0].fields.isCompleted ?? false,
       };
-      if (!action.records[0].fields.isCompleted) {
-        savedTodo.isCompleted = false;
-      }
-
       return {
         ...state,
-        todoList: [...state.todoList, savedTodo],
+        todoList: [...state.todoList, newTodo],
         isSaving: false,
       };
     }
 
-    case actions.endRequest: {
+    case actions.addTodoFailure: {
       return {
         ...state,
-        isLoading: false,
         isSaving: false,
+        error: action.error.message,
       };
     }
 
-    case actions.revertTodo:
-    case actions.updateTodo: {
-      const updatedTodos = state.todoList.map((todo) => {
-        if (todo.id === action.editedTodo.id) {
-          return action.editedTodo;
-        }
-        return todo;
-      });
+    case actions.updateTodoRequest: {
+      return {
+        ...state,
+        isSaving: true,
+      };
+    }
 
-      const updatedState = {
+    case actions.updateTodoSuccess: {
+      const updatedTodos = state.todoList.map((todo) => (todo.id === action.editedTodo.id ? action.editedTodo : todo));
+      return {
         ...state,
         todoList: updatedTodos,
-        error: action.error ? action.error.message : '',
+        isSaving: false,
       };
-      return updatedState;
     }
 
-    case actions.completeTodo: {
+    case actions.updateTodoFailure: {
+      const revertedTodos = state.todoList.map((todo) =>
+        todo.id === action.originalTodo.id ? action.originalTodo : todo
+      );
+      return {
+        ...state,
+        todoList: revertedTodos,
+        isSaving: false,
+        error: action.error.message,
+      };
+    }
+
+    case actions.completeTodoRequest: {
+      return {
+        ...state,
+        isSaving: true,
+      };
+    }
+
+    case actions.completeTodoSuccess: {
       const updatedTodos = state.todoList.map((todo) =>
         todo.id === action.id ? { ...todo, isCompleted: true } : todo
       );
       return {
         ...state,
         todoList: updatedTodos,
+        isSaving: false,
+      };
+    }
+
+    case actions.completeTodoFailure: {
+      const revertedTodos = state.todoList.map((todo) =>
+        todo.id === action.originalTodo.id ? action.originalTodo : todo
+      );
+      return {
+        ...state,
+        todoList: revertedTodos,
+        isSaving: false,
+        error: action.error.message,
       };
     }
 
