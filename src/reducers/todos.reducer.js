@@ -1,10 +1,3 @@
-const initialState = {
-  todoList: [],
-  isLoading: false,
-  isSaving: false,
-  error: '',
-};
-
 const actions = {
   //actions in useEffect that loads todos
   fetchTodos: 'fetchTodos',
@@ -22,6 +15,13 @@ const actions = {
   revertTodo: 'revertTodo',
   //action on Dismiss Error button
   clearError: 'clearError',
+};
+
+const initialState = {
+  todoList: [],
+  isLoading: false,
+  isSaving: false,
+  error: '',
 };
 
 const reducer = (state = initialState, action) => {
