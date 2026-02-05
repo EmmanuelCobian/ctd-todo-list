@@ -3,8 +3,13 @@ import styles from './App.module.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
 import TodosViewForm from './features/TodosViewForm';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useReducer } from 'react';
 import { getAirtableUrl, getAuthToken, createOptions } from './lib/api';
+import {
+  reducer as todosReducer,
+  actions as todoActions,
+  initialState as initialTodosState,
+} from './reducers/todos.reducer';
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -14,6 +19,7 @@ function App() {
   const [sortField, setSortField] = useState('createdTime');
   const [sortDirection, setSortDirection] = useState('desc');
   const [queryString, setQueryString] = useState('');
+  const [todoState, dispatch] = useReducer(todosReducer, initialTodosState);
 
   const encodeUrl = useCallback(() => {
     let searchQuery = '';
