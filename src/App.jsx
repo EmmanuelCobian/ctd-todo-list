@@ -86,9 +86,7 @@ function App() {
 
   const updateTodo = async (editedTodo) => {
     const originalTodo = todoState.todoList.find((todo) => todo.id === editedTodo.id);
-
-    dispatch({ type: todoActions.updateTodoRequest });
-    dispatch({ type: todoActions.updateTodoSuccess, editedTodo: editedTodo });
+    dispatch({ type: todoActions.updateTodo, editedTodo: editedTodo });
 
     const payload = {
       records: [
