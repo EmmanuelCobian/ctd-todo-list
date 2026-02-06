@@ -90,6 +90,17 @@ const reducer = (state = initialState, action) => {
       };
     }
 
+    case actions.completeTodo: {
+      const updatedTodos = state.todoList.map((todo) =>
+        todo.id === action.id ? { ...todo, isCompleted: true } : todo
+      );
+      return {
+        ...state,
+        todoList: updatedTodos,
+        isSaving: false,
+      };
+    }
+
     case actions.completeTodoFailure:
     case actions.updateTodoFailure: {
       const revertedTodos = state.todoList.map((todo) =>
@@ -100,17 +111,6 @@ const reducer = (state = initialState, action) => {
         todoList: revertedTodos,
         isSaving: false,
         error: action.error.message,
-      };
-    }
-
-    case actions.completeTodo: {
-      const updatedTodos = state.todoList.map((todo) =>
-        todo.id === action.id ? { ...todo, isCompleted: true } : todo
-      );
-      return {
-        ...state,
-        todoList: updatedTodos,
-        isSaving: false,
       };
     }
 
