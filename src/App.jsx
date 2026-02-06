@@ -3,7 +3,7 @@ import styles from './App.module.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
 import TodosViewForm from './features/TodosViewForm';
-import { useState, useEffect, useCallback, useReducer } from 'react';
+import { useEffect, useCallback, useReducer } from 'react';
 import { getAirtableUrl, getAuthToken, createOptions } from './lib/api';
 import {
   reducer as todosReducer,
@@ -12,19 +12,16 @@ import {
 } from './reducers/todos.reducer';
 
 function App() {
-  const [sortField, setSortField] = useState('createdTime');
-  const [sortDirection, setSortDirection] = useState('desc');
-  const [queryString, setQueryString] = useState('');
   const [todoState, dispatch] = useReducer(todosReducer, initialTodosState);
 
   const encodeUrl = useCallback(() => {
     let searchQuery = '';
-    let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-    if (queryString) {
-      searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+    let sortQuery = `sort[0][field]=${todoState.sortField}&sort[0][direction]=${todoState.sortDirection}`;
+    if (todoState.queryString) {
+      searchQuery = `&filterByFormula=SEARCH("${todoState.queryString}",+title)`;
     }
     return encodeURI(`${getAirtableUrl()}?${sortQuery}${searchQuery}`);
-  }, [sortField, sortDirection, queryString]);
+  }, [todoState.sortField, todoState.sortDirection, todoState.queryString]);
 
   const url = encodeUrl();
   const token = getAuthToken();
@@ -127,7 +124,7 @@ function App() {
     };
 
     fetchTodos();
-  }, [sortField, sortDirection, queryString]);
+  }, [todoState.sortField, todoState.sortDirection, todoState.queryString]);
 
   if (todoState.error) {
     return (
@@ -146,12 +143,8 @@ function App() {
         <TodoForm onAddTodo={addTodo} isSaving={todoState.isSaving} />
         <TodoList todoList={todoState.todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} isLoading={todoState.isLoading} />
         <TodosViewForm
-          sortDirection={sortDirection}
-          sortField={sortField}
-          setSortDirection={setSortDirection}
-          setSortField={setSortField}
-          queryString={queryString}
-          setQueryString={setQueryString}
+          todoState={todoState}
+          dispatch={dispatch}
         />
       </div>
     </div>

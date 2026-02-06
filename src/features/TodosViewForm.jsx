@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from './TodosViewForm.module.css';
 import styled from 'styled-components';
+import { actions as todoActions } from '../reducers/todos.reducer';
 
 const StyledForm = styled.form`
   display: flex;
@@ -10,15 +11,15 @@ const StyledForm = styled.form`
   margin-top: 1rem;
 `;
 
-function TodosViewForm({ sortDirection, setSortDirection, sortField, setSortField, queryString, setQueryString }) {
-  const [localQueryString, setLocalQueryString] = useState(queryString);
+function TodosViewForm({ todoState, dispatch }) {
+  const [localQueryString, setLocalQueryString] = useState(todoState.queryString);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
-      setQueryString(localQueryString);
+      dispatch({ type: todoActions.changeQueryString, localQueryString: localQueryString });
     }, 500);
     return () => clearTimeout(debounce);
-  }, [localQueryString, setQueryString]);
+  }, [localQueryString, dispatch]);
 
   return (
     <StyledForm onSubmit={(e) => e.preventDefault()}>
@@ -50,9 +51,9 @@ function TodosViewForm({ sortDirection, setSortDirection, sortField, setSortFiel
           name="sortBy"
           id="sortBy"
           onChange={(e) => {
-            setSortField(e.target.value);
+            dispatch({ type: todoActions.changeSortField, value: e.target.value });
           }}
-          value={sortField}
+          value={todoState.sortField}
         >
           <option value="title">Title</option>
           <option value="createdTime">Time added</option>
@@ -65,8 +66,8 @@ function TodosViewForm({ sortDirection, setSortDirection, sortField, setSortFiel
           className={styles.select}
           name="direction"
           id="direction"
-          onChange={(e) => setSortDirection(e.target.value)}
-          value={sortDirection}
+          onChange={(e) => dispatch({ type: todoActions.changeSortDirection, value: e.target.value })}
+          value={todoState.sortDirection}
         >
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>

@@ -13,6 +13,10 @@ const actions = {
   completeTodo: 'completeTodo',
   completeTodoFailure: 'completeTodoFailure',
 
+  changeSortDirection: 'changeSortDirection',
+  changeSortField: 'changeSortField',
+  changeQueryString: 'changeQueryString',
+
   clearError: 'clearError',
 };
 
@@ -20,6 +24,9 @@ const initialState = {
   todoList: [],
   isLoading: false,
   isSaving: false,
+  sortDirection: 'desc',
+  sortField: 'createdTime',
+  queryString: '',
   error: '',
 };
 
@@ -111,6 +118,27 @@ const reducer = (state = initialState, action) => {
         todoList: revertedTodos,
         isSaving: false,
         error: action.error.message,
+      };
+    }
+
+    case actions.changeSortDirection: {
+      return {
+        ...state,
+        sortDirection: action.value,
+      };
+    }
+
+    case actions.changeSortField: {
+      return {
+        ...state,
+        sortField: action.value,
+      };
+    }
+
+    case actions.changeQueryString: {
+      return {
+        ...state,
+        queryString: action.localQueryString,
       };
     }
 
