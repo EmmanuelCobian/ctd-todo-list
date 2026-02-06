@@ -7,12 +7,10 @@ const actions = {
   addTodoSuccess: 'addTodoSuccess',
   addTodoFailure: 'addTodoFailure',
 
-  updateTodoRequest: 'updateTodoRequest',
-  updateTodoSuccess: 'updateTodoSuccess',
+  updateTodo: 'updateTodo',
   updateTodoFailure: 'updateTodoFailure',
 
-  completeTodoRequest: 'completeTodoRequest',
-  completeTodoSuccess: 'completeTodoSuccess',
+  completeTodo: 'completeTodo',
   completeTodoFailure: 'completeTodoFailure',
 
   clearError: 'clearError',
@@ -83,14 +81,7 @@ const reducer = (state = initialState, action) => {
       };
     }
 
-    case actions.updateTodoRequest: {
-      return {
-        ...state,
-        isSaving: true,
-      };
-    }
-
-    case actions.updateTodoSuccess: {
+    case actions.updateTodo: {
       const updatedTodos = state.todoList.map((todo) => (todo.id === action.editedTodo.id ? action.editedTodo : todo));
       return {
         ...state,
@@ -99,6 +90,7 @@ const reducer = (state = initialState, action) => {
       };
     }
 
+    case actions.completeTodoFailure:
     case actions.updateTodoFailure: {
       const revertedTodos = state.todoList.map((todo) =>
         todo.id === action.originalTodo.id ? action.originalTodo : todo
@@ -111,14 +103,7 @@ const reducer = (state = initialState, action) => {
       };
     }
 
-    case actions.completeTodoRequest: {
-      return {
-        ...state,
-        isSaving: true,
-      };
-    }
-
-    case actions.completeTodoSuccess: {
+    case actions.completeTodo: {
       const updatedTodos = state.todoList.map((todo) =>
         todo.id === action.id ? { ...todo, isCompleted: true } : todo
       );
@@ -126,18 +111,6 @@ const reducer = (state = initialState, action) => {
         ...state,
         todoList: updatedTodos,
         isSaving: false,
-      };
-    }
-
-    case actions.completeTodoFailure: {
-      const revertedTodos = state.todoList.map((todo) =>
-        todo.id === action.originalTodo.id ? action.originalTodo : todo
-      );
-      return {
-        ...state,
-        todoList: revertedTodos,
-        isSaving: false,
-        error: action.error.message,
       };
     }
 

@@ -31,7 +31,7 @@ function App() {
 
   const completeTodo = async (id) => {
     const originalTodo = todoState.todoList.find((todo) => todo.id === id);
-    dispatch({ type: todoActions.completeTodoRequest });
+    dispatch({ type: todoActions.completeTodo, id: id });
     const payload = {
       records: [
         {
@@ -50,7 +50,6 @@ function App() {
       if (!resp.ok) {
         throw new Error(resp.message);
       }
-      dispatch({ type: todoActions.completeTodoSuccess, id: id });
     } catch (error) {
       console.error(error.message);
       dispatch({ type: todoActions.completeTodoFailure, originalTodo: originalTodo, error: error });
@@ -58,6 +57,7 @@ function App() {
   };
 
   const addTodo = async (title) => {
+    dispatch({ type: todoActions.addTodoRequest });
     const payload = {
       records: [
         {
@@ -72,7 +72,6 @@ function App() {
     const options = createOptions('POST', token, payload);
 
     try {
-      dispatch({ type: todoActions.addTodoRequest });
       const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error(resp.message);
@@ -87,7 +86,10 @@ function App() {
 
   const updateTodo = async (editedTodo) => {
     const originalTodo = todoState.todoList.find((todo) => todo.id === editedTodo.id);
+
     dispatch({ type: todoActions.updateTodoRequest });
+    dispatch({ type: todoActions.updateTodoSuccess, editedTodo: editedTodo });
+
     const payload = {
       records: [
         {
@@ -107,7 +109,6 @@ function App() {
       if (!resp.ok) {
         throw new Error(resp.message);
       }
-      dispatch({ type: todoActions.updateTodoSuccess, editedTodo: editedTodo });
     } catch (error) {
       dispatch({ type: todoActions.updateTodoFailure, originalTodo: originalTodo, error: error });
     }
