@@ -152,25 +152,27 @@ function App() {
   }
 
   return (
-    <div className={styles.container}>
+    <>
       <Header title={title} />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <TodosPage
-              addTodo={addTodo}
-              updateTodo={updateTodo}
-              completeTodo={completeTodo}
-              todoState={todoState}
-              dispatch={dispatch}
-            />
-          }
-        />
-        <Route path="/about" element={<About />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </div>
+      <div className={styles.container}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <TodosPage
+                addTodo={addTodo}
+                updateTodo={updateTodo}
+                completeTodo={completeTodo}
+                todoState={todoState}
+                dispatch={dispatch}
+              />
+            }
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </>
   );
 }
 
