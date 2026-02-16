@@ -1,7 +1,9 @@
 import './App.css';
 import styles from './App.module.css';
 import TodosPage from './pages/TodosPage';
+import About from './pages/About';
 import Header from './shared/Header';
+import NotFound from './pages/NotFound';
 import { useEffect, useCallback, useReducer } from 'react';
 import { getAirtableUrl, getAuthToken, createOptions } from './lib/api';
 import {
@@ -165,8 +167,8 @@ function App() {
             />
           }
         />
-        <Route path="/about" element={<h1>About</h1>} />
-        <Route path="*" element={<h1>Not Found</h1>} />
+        <Route path="/about" element={<About />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );
