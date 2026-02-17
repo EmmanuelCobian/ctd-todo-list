@@ -7,10 +7,10 @@ function TodoList({ todoList, onCompleteTodo, onUpdateTodo, isLoading }) {
   const filteredTodoList = todoList.filter((todo) => !todo.isCompleted);
   const [searchParams, setSearchParams] = useSearchParams();
   const itemsPerPage = 15;
+  const totalPages = Math.ceil(filteredTodoList.length / itemsPerPage);
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const indexOfFirstTodo = (currentPage - 1) * itemsPerPage;
   const indexOfLastTodo = indexOfFirstTodo + itemsPerPage;
-  const totalPages = Math.ceil(filteredTodoList.length / itemsPerPage);
   const currentEntries = filteredTodoList.slice(indexOfFirstTodo, indexOfLastTodo);
   const hasTodos = currentEntries.length > 0;
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ function TodoList({ todoList, onCompleteTodo, onUpdateTodo, isLoading }) {
         <button onClick={handlePreviousPage} disabled={currentPage == 1}>
           Previous
         </button>
-        <span>
+        <span className={styles.pagination}>
           Page {currentPage} of {totalPages}
         </span>
         <button onClick={handleNextPage} disabled={currentPage == totalPages}>
