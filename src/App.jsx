@@ -1,8 +1,9 @@
 import './App.css';
 import styles from './App.module.css';
-import TodoList from './features/TodoList/TodoList';
-import TodoForm from './features/TodoForm';
-import TodosViewForm from './features/TodosViewForm';
+import TodosPage from './pages/TodosPage';
+import About from './pages/About';
+import Header from './shared/Header';
+import NotFound from './pages/NotFound';
 import { useEffect, useCallback, useReducer } from 'react';
 import { getAirtableUrl, getAuthToken, createOptions } from './lib/api';
 import {
@@ -10,9 +11,13 @@ import {
   actions as todoActions,
   initialState as initialTodosState,
 } from './reducers/todos.reducer';
+import { useLocation, Routes, Route } from 'react-router';
+import { useState } from 'react';
 
 function App() {
   const [todoState, dispatch] = useReducer(todosReducer, initialTodosState);
+  const [title, setTitle] = useState('Todo List');
+  const location = useLocation();
 
   const encodeUrl = useCallback(() => {
     let searchQuery = '';
@@ -126,6 +131,16 @@ function App() {
     fetchTodos();
   }, [todoState.sortField, todoState.sortDirection, todoState.queryString]);
 
+  useEffect(() => {
+    if (location.pathname == '/') {
+      setTitle('Todo List');
+    } else if (location.pathname == '/about') {
+      setTitle('About');
+    } else {
+      setTitle('Not Found');
+    }
+  }, [location]);
+
   if (todoState.error) {
     return (
       <div className={styles.error}>
@@ -137,17 +152,27 @@ function App() {
   }
 
   return (
-    <div className={styles.container}>
-      <h1>My Todos</h1>
-      <div>
-        <TodoForm onAddTodo={addTodo} isSaving={todoState.isSaving} />
-        <TodoList todoList={todoState.todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} isLoading={todoState.isLoading} />
-        <TodosViewForm
-          todoState={todoState}
-          dispatch={dispatch}
-        />
+    <>
+      <Header title={title} />
+      <div className={styles.container}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <TodosPage
+                addTodo={addTodo}
+                updateTodo={updateTodo}
+                completeTodo={completeTodo}
+                todoState={todoState}
+                dispatch={dispatch}
+              />
+            }
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </div>
-    </div>
+    </>
   );
 }
 

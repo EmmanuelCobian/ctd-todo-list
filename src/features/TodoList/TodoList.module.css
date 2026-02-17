@@ -2,5 +2,9 @@
 	list-style: none;
 	padding: 0;
 	margin: 0;
+	align-self: start;
 }
 
+.pagination {
+	margin: 0 1rem;
+}
